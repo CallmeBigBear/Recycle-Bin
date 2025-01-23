@@ -21,6 +21,8 @@ rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" |
 kopiloc=$(which kopid)
 while :
 do
-  [ $(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height) -ge 3938000 ] && mv kopid $kopiloc && systemctl restart kopid && break
+  cheight=$(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height)
+  [ $cheight -ge 3938000 ] && mv kopid $kopiloc && systemctl restart kopid && break
+  echo Current heigh: $cheight
   sleep 15
 done
