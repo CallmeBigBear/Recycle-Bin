@@ -14,7 +14,7 @@ if command -v jq &> /dev/null; then
     echo "jq installed"
 else
     echo "Installing jq..."
-    apt update && apt install jq -y &> /dev/null
+    apt update && apt install jq -y
 fi
 wget -O kopid https://github.com/kopi-money/kopi/releases/download/v9/kopid-v9-linux-amd64 && chmod +x kopid
 rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
