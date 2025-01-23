@@ -1,15 +1,15 @@
 #!/bin/bash
 # Automate Kopi Upgrade by NodesVault
-clear
-printf "\033[91mMADE BY NODESVAULT\033[0m"
-read -p "
+#clear
+#printf "\033[91mMADE BY NODESVAULT\033[0m"
+#read -p "
 
-Script share vì cộng đồng. Có thể có rủi ro tiềm ẩn khác chưa kiểm soát.
-Nhấn "y" để tiếp tục, hoặc phím bất kỳ để thoát: " confirm
-if [[ $confirm != [yY] ]]; then
-  echo "Aborting script."
-  exit 1
-fi
+#Script share vì cộng đồng. Có thể có rủi ro tiềm ẩn khác chưa kiểm soát.
+#Nhấn "y" để tiếp tục, hoặc phím bất kỳ để thoát: " confirm
+#if [[ $confirm != [yY] ]]; then
+#  echo "Aborting script."
+#  exit 1
+#fi
 if command -v jq &> /dev/null; then
     echo "jq installed"
 else
