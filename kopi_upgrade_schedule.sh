@@ -4,7 +4,7 @@ clear
 printf "\033[91mMADE BY NODESVAULT\033[0m"
 read -p "
 
-Script share vì cộng đồng. Có thể có rủi ro tiềm ẩn chưa kiểm soát.
+Script share vì cộng đồng. Có thể có rủi ro tiềm ẩn khác chưa kiểm soát.
 Nhấn "y" để tiếp tục, hoặc phím bất kỳ để thoát: " confirm
 if [[ $confirm != [yY] ]]; then
   echo "Aborting script."
