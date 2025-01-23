@@ -23,6 +23,6 @@ while :
 do
   cheight=$(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height)
   [ $cheight -ge 3938000 ] && mv kopid $kopiloc && systemctl restart kopid && break
-  echo Current heigh: $cheight
+  echo Block left: $((3938000 - cheight))
   sleep 15
 done
