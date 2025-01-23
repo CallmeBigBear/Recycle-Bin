@@ -11,7 +11,7 @@ if [[ $confirm != [yY] ]]; then
   exit 1
 fi
 if command -v jq &> /dev/null; then
-#  echo "jq installed"
+    echo "jq installed"
 else
     echo "Installing jq..."
     apt update && apt install jq -y &> /dev/null
