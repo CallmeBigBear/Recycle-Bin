@@ -22,5 +22,5 @@ kopiloc=$(which kopid)
 while :
 do
   [ $(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height) -ge 3938000 ] && mv kopid $kopiloc && systemctl restart kopid && break
-  sleep 10
+  sleep 15
 done
