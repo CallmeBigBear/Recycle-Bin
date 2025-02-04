@@ -23,7 +23,7 @@ printf "\033[91mHEIGHT TO UPGRADE: $destheight \033[0m"
 while :
 do
   currentheight=$(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height)
-  [ $currentheight -ge $destheight ] && mv kopid $kopiloc && systemctl restart kopid && break
+  [ $currentheight -ge $destheight ] && mv kopid $kopiloc && systemctl restart kopid && echo "UPGRADED!!!" && break
     echo Block left: $((destheight - currentheight))
   sleep 15
 done
