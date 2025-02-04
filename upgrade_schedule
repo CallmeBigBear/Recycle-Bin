@@ -13,8 +13,11 @@ fi
 wget -O kopid $binarylink && chmod +x kopid
 rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
 kopiloc=$(which kopid)
-echo "VERSION:"
+echo "OLD VERSION:"
+kopid version
+echo "NEW VERSION:"
 ./kopid version
+
 printf "\033[91mHEIGHT TO UPGRADE: $destheight \033[0m"
 
 while :
