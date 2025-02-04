@@ -1,8 +1,9 @@
 #!/bin/bash
 # Automate Kopi Upgrade by NodesVault
-read -p "Enter block height to upgrade new version: " destheight
-read -p "Enter binary link of new version: " binarylink
-
+#read -p "Enter block height to upgrade new version: " destheight
+#read -p "Enter binary link of new version: " binarylink
+destheight=4397000
+binarylink='https://github.com/kopi-money/kopi/releases/download/v12/kopid-v12-linux-amd64'
 if command -v jq &> /dev/null; then
     echo "jq installed"
 else
@@ -12,7 +13,7 @@ fi
 wget -O kopid $binarylink && chmod +x kopid
 rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
 kopiloc=$(which kopid)
-./kopid version
+echo VERSION: ./kopid version
 printf "\033[91mHEIGHT TO UPGRADE: $destheight \033[0m"
 
 while :
