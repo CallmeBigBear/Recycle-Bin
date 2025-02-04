@@ -1,0 +1,24 @@
+#!/bin/bash
+# Automate Kopi Upgrade by NodesVault
+read -p "Enter block height to upgrade new version: " destheight
+read -p "Enter binary link of new version: " binarylink
+
+if command -v jq &> /dev/null; then
+    echo "jq installed"
+else
+    echo "Installing jq..."
+    apt update && apt install jq -y
+fi
+wget -O kopid $binarylink && chmod +x kopid
+rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
+kopiloc=$(which kopid)
+kopid --version
+printf "\033[91mHeight to upgrade: $destheight \033[0m"
+
+while :
+do
+  currentheight=$(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height)
+  [ $currentheight -ge $destheight ] && mv kopid $kopiloc && systemctl restart kopid && break
+    echo Block left: $((destheight - currentheight))
+  sleep 15
+done
