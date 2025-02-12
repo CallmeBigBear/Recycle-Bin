@@ -1,18 +1,26 @@
 #!/bin/bash
 # Automate Kopi Upgrade by NodesVault
-#read -p "Enter block height to upgrade new version: " destheight
-#read -p "Enter binary link of new version: " binarylink
-destheight=4397000
-binarylink='https://github.com/kopi-money/kopi/releases/download/v12/kopid-v12-linux-amd64'
-if command -v jq &> /dev/null; then
-    echo "jq installed"
+
+if [ $1 -eq 0 ]; then
+    echo "ERROR: Enter new version | e.g. v14"
+    exit 1
 else
-    echo "Installing jq..."
+    BINARY_LINK="https://github.com/kopi-money/kopi/releases/download/$1/kopid-$1-linux-amd64"
+    DEST_HEIGHT=$2
+
+fi
+
+#Install jq
+if command -v jq &> /dev/null; then
+    echo "jq INSTALLED"
+else
+    echo "INSTALLING jq..."
     apt update && apt install jq -y
 fi
-wget -O kopid $binarylink && chmod +x kopid
+
+wget -O kopid $BINARY_LINK && chmod +x kopid
 rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
-kopiloc=$(which kopid)
+BINARY_LOCATION=$(which kopid)
 echo "OLD VERSION:"
 kopid version
 echo "NEW VERSION:"
@@ -23,7 +31,7 @@ printf "\033[91mHEIGHT TO UPGRADE: $destheight \033[0m"
 while :
 do
   currentheight=$(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height)
-  [ $currentheight -ge $destheight ] && mv kopid $kopiloc && systemctl restart kopid && echo "UPGRADED!!!" && break
+  [ $currentheight -ge $destheight ] && mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADED!!!" && break
     echo Block left: $((destheight - currentheight))
   sleep 15
 done
