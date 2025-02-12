@@ -1,14 +1,16 @@
 #!/bin/bash
-# Automate Kopi Upgrade by NodesVault
+# Auto Upgrade by CONMIBITBIA
 
 if [ $1 -eq 0 ]; then
     echo "ERROR: Enter new version | e.g. v14"
     exit 1
-else
-    BINARY_LINK="https://github.com/kopi-money/kopi/releases/download/$1/kopid-$1-linux-amd64"
-    DEST_HEIGHT=$2
-
 fi
+
+BINARY_LINK="https://github.com/kopi-money/kopi/releases/download/$1/kopid-$1-linux-amd64"
+DEST_HEIGHT=$2
+RPC_PORT=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
+BINARY_LOCATION=$(which kopid)
+
 
 #Install jq
 if command -v jq &> /dev/null; then
@@ -18,20 +20,28 @@ else
     apt update && apt install jq -y
 fi
 
+#Download and recheck version
 wget -O kopid $BINARY_LINK && chmod +x kopid
-rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
-BINARY_LOCATION=$(which kopid)
 echo "OLD VERSION:"
 kopid version
+echo "BINARY LOCATION FOUND: $BINARY_LOCATION"
+echo ""
 echo "NEW VERSION:"
 ./kopid version
+sleep 3
 
-printf "\033[91mHEIGHT TO UPGRADE: $destheight \033[0m"
+if [ $DEST_HEIGHT != 0 ]; then
+    #Wait to DEST_HEIGHT, move binary, restart service
+    printf "\033[91mHEIGHT TO UPGRADE: $DEST_HEIGHT \033[0m"
 
-while :
-do
-  currentheight=$(curl -s localhost:$rpc_port/status | jq -r .result.sync_info.latest_block_height)
-  [ $currentheight -ge $destheight ] && mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADED!!!" && break
-    echo Block left: $((destheight - currentheight))
-  sleep 15
-done
+    while :
+    do
+      CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
+      [ $CURRENT_HEIGHT -ge $DEST_HEIGHT ] && mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADED!!!" && break
+        echo Block left: $((DEST_HEIGHT - CURRENT_HEIGHT))
+      sleep 15
+    done
+else
+    #Move binary and restart service
+    mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADED!!!"
+fi
