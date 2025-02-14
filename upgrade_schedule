@@ -1,16 +1,23 @@
 #!/bin/bash
 # Auto Upgrade by CONMIBITBIA
 
-if [ $1 -eq 0 ]; then
+if [[ $1 == "" ]]; then
     echo "ERROR: Enter new version | e.g. v14"
-    exit 1
+    exit
 fi
 
+#Đổi màu chữ commandline
+GREEN="\e[1m\e[1;32m" # green color
+RED="\e[1m\e[1;31m" # red color
+BLUE='\033[0;34m'   # blue color
+YELLOW="\e[1m\e[1;33m"  # yellow color
+NC="\e[0m"          # no color
+
+BINARY_VERSION=$1
 BINARY_LINK="https://github.com/kopi-money/kopi/releases/download/$1/kopid-$1-linux-amd64"
 DEST_HEIGHT=$2
 RPC_PORT=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
 BINARY_LOCATION=$(which kopid)
-
 
 #Install jq
 if command -v jq &> /dev/null; then
@@ -20,28 +27,70 @@ else
     apt update && apt install jq -y
 fi
 
-#Download and recheck version
-wget -O kopid $BINARY_LINK && chmod +x kopid
-echo "OLD VERSION:"
-kopid version
-echo "BINARY LOCATION FOUND: $BINARY_LOCATION"
-echo ""
-echo "NEW VERSION:"
-./kopid version
-sleep 3
+#Check OS
+getOsArch() {
+        a=`arch`
+        str="aarch"
+        result=$(echo $a | grep "${str}")
+        if [[ "$result" != "" ]]
+        then
+                #echo "this is ARM cpu:" $a
+                return 2;
+        else
+                #echo "this is not AMD cpu:" $a
+                return 1;
+        fi
+}
+getOsArch
+if [ $? -eq 2 ];then
+  # echo "This is ARM CPU"
+  cd $HOME && rm kopi -r
+  git clone https://github.com/kopi-money/kopi.git
+  cd kopi
+  git checkout $BINARY_VERSION
+  make install
+  kopid version
+  echo -e "${GREEN}WAITING TO RESTART SERVICE${NC}"
+  sleep 5
 
-if [ $DEST_HEIGHT != 0 ]; then
+  if [ $DEST_HEIGHT != 0 ]; then
+    echo -r "${BLUE}HEIGHT TO UPGRADE: $DEST_HEIGHT ${NC}"
+    while :
+      do
+        CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
+        [ $CURRENT_HEIGHT -ge $DEST_HEIGHT ] && systemctl restart kopid && echo -e "${GREEN}UPGRADE SUCCESSFULLY!!!${NC}" && break
+        echo Block left: $((DEST_HEIGHT - CURRENT_HEIGHT))
+        sleep 15
+      done
+  else
+    systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!"
+  fi
+else
+  # echo "This is AMD CPU"
+  # Download and recheck version
+  wget -O kopid $BINARY_LINK && chmod +x kopid
+  echo "OLD VERSION:"
+  kopid version
+  echo "BINARY LOCATION FOUND: $BINARY_LOCATION"
+  echo ""
+  echo "NEW VERSION:"
+  ./kopid version
+  sleep 5
+
+  if [ $DEST_HEIGHT != 0 ]; then
     #Wait to DEST_HEIGHT, move binary, restart service
     printf "\033[91mHEIGHT TO UPGRADE: $DEST_HEIGHT \033[0m"
 
     while :
     do
       CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
-      [ $CURRENT_HEIGHT -ge $DEST_HEIGHT ] && mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADED!!!" && break
-        echo Block left: $((DEST_HEIGHT - CURRENT_HEIGHT))
+      [ $CURRENT_HEIGHT -ge $DEST_HEIGHT ] && mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!" && break
+      echo Block left: $((DEST_HEIGHT - CURRENT_HEIGHT))
       sleep 15
     done
-else
+  else
     #Move binary and restart service
-    mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADED!!!"
+    mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!"
+  fi
 fi
+
