@@ -1,5 +1,5 @@
 #!/bin/bash
-# Auto Upgrade by CONMIBITBIA
+# VNNODE Auto Upgrade
 
 if [[ $1 == "" ]]; then
     echo "ERROR: Enter new version | e.g. v14"
