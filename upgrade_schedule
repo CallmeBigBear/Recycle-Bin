@@ -54,7 +54,7 @@ if [ $? -eq 2 ];then
   sleep 5
 
   if [ $DEST_HEIGHT != 0 ]; then
-    echo -r "${BLUE}HEIGHT TO UPGRADE: $DEST_HEIGHT ${NC}"
+    echo -e "${BLUE}HEIGHT TO UPGRADE: $DEST_HEIGHT ${NC}"
     while :
       do
         CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
