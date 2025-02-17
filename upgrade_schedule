@@ -49,7 +49,8 @@ if [ $? -eq 2 ];then
   git checkout $BINARY_VERSION
   make install
   kopid version
-  echo -e "${GREEN}WAITING TO RESTART SERVICE${NC}"
+  echo -e "${GREEN}BINARY INSTALLED!"
+  echo -e "WAITING TO RESTART SERVICE${NC}"
   sleep 5
 
   if [ $DEST_HEIGHT != 0 ]; then
@@ -66,7 +67,6 @@ if [ $? -eq 2 ];then
   fi
 else
   # echo "This is AMD CPU"
-  # Download and recheck version
   wget -O kopid $BINARY_LINK && chmod +x kopid
   echo "OLD VERSION:"
   kopid version
@@ -74,6 +74,8 @@ else
   echo ""
   echo "NEW VERSION:"
   ./kopid version
+  echo -e "${GREEN}BINARY INSTALLED!"
+  echo -e "WAITING TO RESTART SERVICE${NC}"
   sleep 5
 
   if [ $DEST_HEIGHT != 0 ]; then
