@@ -58,7 +58,7 @@ if [ $? -eq 2 ];then
     while :
       do
         CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
-        [ $CURRENT_HEIGHT -ge $DEST_HEIGHT ] && systemctl restart kopid && echo -e "${GREEN}UPGRADE SUCCESSFULLY!!!${NC}" && break
+        [ $CURRENT_HEIGHT == $DEST_HEIGHT ] && systemctl restart kopid && echo -e "${GREEN}UPGRADE SUCCESSFULLY!!!${NC}" && break
         echo Block left: $((DEST_HEIGHT - CURRENT_HEIGHT))
         sleep 15
       done
@@ -85,7 +85,7 @@ else
     while :
     do
       CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
-      [ $CURRENT_HEIGHT -ge $DEST_HEIGHT ] && mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!" && break
+      [ $CURRENT_HEIGHT == $DEST_HEIGHT ] && mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!" && break
       echo Block left: $((DEST_HEIGHT - CURRENT_HEIGHT))
       sleep 15
     done
