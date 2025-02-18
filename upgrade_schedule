@@ -9,14 +9,11 @@ RED="\e[1m\e[1;31m" # red color
 BLUE='\033[0;34m'   # blue color
 YELLOW="\e[1m\e[1;33m"  # yellow color
 NC="\e[0m"          # no color
-
 BINARY_VERSION=$1
 BINARY_LINK="https://github.com/kopi-money/kopi/releases/download/$1/kopid-$1-linux-amd64"
 DEST_HEIGHT=$2
 RPC_PORT=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.kopid/config/config.toml" | cut -d ':' -f 3)
 BINARY_LOCATION=$(which kopid)
-
-#Install jq
 if command -v jq &> /dev/null; then
     echo "jq INSTALLED"
 else
