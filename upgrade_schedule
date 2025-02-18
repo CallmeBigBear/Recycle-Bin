@@ -44,7 +44,6 @@ if [ $? -eq 2 ];then
   echo -e "${GREEN}NEW VERSION READY FOR UPGRADE${NC}"
   ./kopid_new version
   sleep 5
-
   if [ $DEST_HEIGHT != 0 ]; then
     echo -e "${BLUE}HEIGHT TO UPGRADE: $DEST_HEIGHT ${NC}"
     while :
@@ -69,7 +68,6 @@ else
   sleep 5
   if [ $DEST_HEIGHT != 0 ]; then
     printf "\033[91mHEIGHT TO UPGRADE: $DEST_HEIGHT \033[0m"
-
     while :
     do
       CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
