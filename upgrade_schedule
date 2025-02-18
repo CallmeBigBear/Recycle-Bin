@@ -46,11 +46,14 @@ if [ $? -eq 2 ];then
   cd $HOME && rm kopi -r
   git clone https://github.com/kopi-money/kopi.git
   cd kopi
+  # Backup binary file
+  cp $BINARY_LOCATION ./kopid_old
   git checkout $BINARY_VERSION
   make install
-  kopid version
-  echo -e "${GREEN}BINARY INSTALLED!"
-  echo -e "WAITING TO RESTART SERVICE${NC}"
+  cp $BINARY_LOCATION ./kopid_new
+  mv ./kopid_old $BINARY_LOCATION
+  echo -e "${GREEN}NEW VERSION READY FOR UPGRADE${NC}"
+  ./kopid_new version
   sleep 5
 
   if [ $DEST_HEIGHT != 0 ]; then
@@ -58,12 +61,12 @@ if [ $? -eq 2 ];then
     while :
       do
         CURRENT_HEIGHT=$(curl -s localhost:$RPC_PORT/status | jq -r .result.sync_info.latest_block_height)
-        [[ $CURRENT_HEIGHT == $DEST_HEIGHT ]] && systemctl restart kopid && echo -e "${GREEN}UPGRADE SUCCESSFULLY!!!${NC}" && break
+        [[ $CURRENT_HEIGHT == $DEST_HEIGHT ]] && mv .kopid_new $BINARY_LOCATION && systemctl restart kopid && echo -e "${GREEN}UPGRADE SUCCESSFULLY!!!${NC}" && break
         echo Block left: $((DEST_HEIGHT - CURRENT_HEIGHT))
         sleep 15
       done
   else
-    systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!"
+    mv .kopid_new $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!"
   fi
 else
   # echo "This is AMD CPU"
@@ -74,8 +77,7 @@ else
   echo ""
   echo "NEW VERSION:"
   ./kopid version
-  echo -e "${GREEN}BINARY INSTALLED!"
-  echo -e "WAITING TO RESTART SERVICE${NC}"
+  echo -e "${GREEN}NEW VERSION READY FOR UPGRADE${NC}"
   sleep 5
 
   if [ $DEST_HEIGHT != 0 ]; then
@@ -90,8 +92,6 @@ else
       sleep 15
     done
   else
-    #Move binary and restart service
     mv kopid $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!"
   fi
 fi
-
