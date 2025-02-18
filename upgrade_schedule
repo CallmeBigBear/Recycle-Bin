@@ -1,11 +1,9 @@
 #!/bin/bash
-# VNNODE Auto Upgrade
-
+# VNNODE AUTO UPGRADE
 if [[ $1 == "" ]]; then
     echo "ERROR: Enter new version | e.g. v14"
     exit
 fi
-
 GREEN="\e[1m\e[1;32m" # green color
 RED="\e[1m\e[1;31m" # red color
 BLUE='\033[0;34m'   # blue color
@@ -25,28 +23,22 @@ else
     echo "INSTALLING jq..."
     apt update && apt install jq -y
 fi
-
-#Check OS
 getOsArch() {
         a=`arch`
         str="aarch"
         result=$(echo $a | grep "${str}")
         if [[ "$result" != "" ]]
         then
-                #echo "this is ARM cpu:" $a
                 return 2;
         else
-                #echo "this is not AMD cpu:" $a
                 return 1;
         fi
 }
 getOsArch
 if [ $? -eq 2 ];then
-  # echo "This is ARM CPU"
   cd $HOME && rm kopi -r
   git clone https://github.com/kopi-money/kopi.git
   cd kopi
-  # Backup binary file
   cp $BINARY_LOCATION ./kopid_old
   git checkout $BINARY_VERSION
   make install
@@ -69,7 +61,6 @@ if [ $? -eq 2 ];then
     mv .kopid_new $BINARY_LOCATION && systemctl restart kopid && echo "UPGRADE SUCCESSFULLY!!!"
   fi
 else
-  # echo "This is AMD CPU"
   wget -O kopid $BINARY_LINK && chmod +x kopid
   echo "OLD VERSION:"
   kopid version
@@ -79,9 +70,7 @@ else
   ./kopid version
   echo -e "${GREEN}NEW VERSION READY FOR UPGRADE${NC}"
   sleep 5
-
   if [ $DEST_HEIGHT != 0 ]; then
-    #Wait to DEST_HEIGHT, move binary, restart service
     printf "\033[91mHEIGHT TO UPGRADE: $DEST_HEIGHT \033[0m"
 
     while :
